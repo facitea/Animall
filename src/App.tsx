@@ -1,15 +1,24 @@
 import './App.css'
 import Header from './header/Header'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Trip from './main/Trip'
+// import Trip from './main/Trip'
 import Training from './main/Training'
 import Shop from './main/Shop'
 import MyPage from './main/MyPage'
 import BoardList from './main/BoardList'
-import { db } from './firebase'
-import { collection, addDoc } from "firebase/firestore";
+import SignUp from './main/SingUp'
+import Login from './main/Login'
+// import { useEffect } from 'react'
+// import { db } from './firebase'
+// import { collection, addDoc } from "firebase/firestore";
+import { useAuth } from './main/useAuth.ts';
+import UploadPost from './main/UploadPost.tsx'
 
 function App() {
+  // const isLoggedIn = false;
+
+  const user = useAuth();
+
   // async function addData() {
   //   await addDoc(collection(db, "게시판"), {
   //     content: 'content',
@@ -43,8 +52,11 @@ function App() {
             <Route path="/boardList" element={<BoardList />} />
             <Route path="/training" element={<Training />} />
             <Route path="/shop" element={<Shop />} />
-            <Route path="/trip" element={<Trip />} />
-            <Route path="/myPage" element={<MyPage />} />
+            <Route path="/trip" element={<UploadPost />} />
+            {/* <Route path="/myPage" element={isLoggedIn ? <Login /> : <Login />} /> */}
+            <Route path="/myPage" element={user ? <MyPage /> : <Login />} />
+            <Route path='/signup' element={<SignUp />} />
+            <Route path='/uploadPost' element={<UploadPost />} />
           </Routes>
         </main>
         <footer></footer>

@@ -8,6 +8,7 @@ import samsung from '../assets/이건희.jpg'
 import dragon from '../assets/이재용.jpg'
 import june from '../assets/정몽준.jpg'
 import bug from '../assets/주커버그.jpg'
+import { Link } from "react-router-dom";
 
 const MyPage = () => {
     return (
@@ -80,7 +81,8 @@ const MyPage = () => {
             </div>
 
             <input type="button" id="notYetLogin" value="임시버튼.인증=버튼클릭" />
-            <a href="./writingPage.html">글쓰기</a>
+            <div><Link to="/UploadPost" />글쓰기</div>
+
 
         </>
     )
