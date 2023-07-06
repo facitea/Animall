@@ -49,6 +49,7 @@ function App() {
         <header><Header /></header>
         <main>
           <Routes>
+          <Route path="/" element={<BoardList />} />
             <Route path="/boardList" element={<BoardList />} />
             <Route path="/training" element={<Training />} />
             <Route path="/shop" element={<Shop />} />

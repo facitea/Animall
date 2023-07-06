@@ -23,14 +23,20 @@ const MyPage = () => {
                     <div className="profileSecondStair">
                         <div className="relationshipTable">
                             <table>
-                                <th>게시물</th>
-                                <th>팔로워</th>
-                                <th>팔로잉</th>
-                                <tr>
-                                    <td>1</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                </tr>
+                                <thead>
+                                    <tr>
+                                        <th>게시물</th>
+                                        <th>팔로워</th>
+                                        <th>팔로잉</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                    </tr>
+                                </tbody>
                             </table>
                             <div className="personalToSetting">
                                 <div className="personalTable">

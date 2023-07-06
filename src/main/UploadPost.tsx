@@ -5,6 +5,7 @@ import { getAuth } from 'firebase/auth';
 // import { db } from '../firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 // import { limit } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 // const UploadPost = () => {
 //   const [file, setFile] = useState(null); // 업로드할 파일 상태
@@ -83,6 +84,8 @@ const UploadPost = () => {
   const nickname = auth.currentUser?.displayName || '무명';
   const profileImageUrl = auth.currentUser?.photoURL || '';
 
+  const navigate = useNavigate();
+
   const handleChange = (e: any) => { // 파일 선택 핸들러
     setFile(e.target.files[0]);
   };
@@ -124,6 +127,11 @@ const UploadPost = () => {
               content: content,
               date: serverTimestamp()
             });
+
+            alert('작성 완료');
+            
+            navigate("/BoardList");
+
           });
         }
       );

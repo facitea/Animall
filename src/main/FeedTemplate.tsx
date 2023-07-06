@@ -1,7 +1,9 @@
 import './FeedTemplate.css'
 // import PropTypes from "prop-types";
 //아이디, 닉네임, 사진url, 좋아요갯수, 게시글내용, 날짜
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, deleteDoc, doc } from 'firebase/firestore';
+import { forwardRef } from 'react';
+import { db } from '../firebase';
 
 type PostData = {
     id: string;
@@ -59,12 +61,20 @@ type PostData = {
 //     )
 // }
 
-const FeedTemplate: React.FC<PostData> = ({ nickname, profileImageUrl, imageUrl, likes, content, date }) => {
+const FeedTemplate = forwardRef<HTMLDivElement, PostData>(({ id, nickname, profileImageUrl, imageUrl, likes, content, date }, ref) => {
     // const displayDate = new Date(date.seconds * 1000).toLocaleDateString(); // this converts it to a string in the format "MM/DD/YYYY"
     const displayDate = new Date(date.seconds * 1000).toLocaleString("ko-KR"); // 한국 표준 시간대에 맞게 시간까지 표시
 
+    const handleDelete = async () => {
+        try {
+            await deleteDoc(doc(db, 'posts', id));
+        } catch (error) {
+            console.error('Error deleting post:', error);
+        }
+    };
+
     return (
-        <div className="feedContentBox">
+        <div className="feedContentBox" ref={ref}>
             <div className="feedHeader">
                 <div className="headerLeft">
                     <div className="profileImageCircle">
@@ -103,10 +113,11 @@ const FeedTemplate: React.FC<PostData> = ({ nickname, profileImageUrl, imageUrl,
             </div>
             <div>
                 <div className="createdDate">{displayDate}</div>
+                <button onClick={handleDelete}>삭제</button>
             </div>
         </div>
     )
-}
+})
 
 
 // FeedTemplate.propTypes = {

@@ -122,11 +122,138 @@
 
 // export default BoardList;
 
-import { useState, useEffect } from 'react';
+
+
+
+
+
+
+// import { useState, useEffect } from 'react';
+// import { db } from '../firebase';
+// import { collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
+// import FeedTemplate from "./FeedTemplate";
+// import { Timestamp } from 'firebase/firestore';
+
+
+// type PostData = {
+//     id: string;
+//     nickname: string;
+//     profileImageUrl: string;
+//     imageUrl: string;
+//     likes: number;
+//     content: string;
+//     date: Timestamp;
+// };
+
+// const BoardList = () => {
+
+//     //    const [posts, setPosts] = useState([]); // 불러온 게시물들을 저장할 상태
+//     const [posts, setPosts] = useState<PostData[]>([]);
+
+//     useEffect(() => {
+//         const fetchPosts = async () => {
+//             const postsCollection = collection(db, 'posts');
+//             const postsQuery = query(postsCollection, orderBy('date', 'desc'), limit(5)); // 가장 최근의 5개의 게시물을 불러옵니다.
+//             const postsSnapshot = await getDocs(postsQuery);
+//             // const postsData = postsSnapshot.docs.map((doc) => doc.data());
+//             const postsData = postsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as PostData);
+//             setPosts(postsData); // 불러온 게시물들을 상태에 저장합니다.
+//         };
+
+//         fetchPosts(); // 게시물 불러오기를 시작합니다.
+//     }, []);
+
+//     return (
+//         <div>
+//             {posts.map((post, index) => (
+//                 <FeedTemplate key={index} {...post} /> // 각 게시물을 FeedTemplate 컴포넌트로 표시합니다.
+//             ))}
+//         </div>
+//     );
+// };
+
+// export default BoardList;
+
+// import { useState, useEffect, useRef, useCallback } from 'react';
+// import { db } from '../firebase';
+// import { collection, query, orderBy, getDocs, limit, startAfter, DocumentData } from 'firebase/firestore';
+// import FeedTemplate from "./FeedTemplate";
+// import { Timestamp, QueryDocumentSnapshot } from 'firebase/firestore';
+
+// type PostData = {
+//     id: string;
+//     nickname: string;
+//     profileImageUrl: string;
+//     imageUrl: string;
+//     likes: number;
+//     content: string;
+//     date: Timestamp;
+// };
+
+// const BoardList = () => {
+//     const [posts, setPosts] = useState<PostData[]>([]);
+//     const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+//     const observer = useRef<IntersectionObserver | null>(null);
+
+//     const fetchPosts = async (lastDoc: QueryDocumentSnapshot<DocumentData> | null = null) => {
+//         let postsQuery;
+//         if (lastDoc) {
+//             postsQuery = query(
+//                 collection(db, 'posts'),
+//                 orderBy('date', 'desc'),
+//                 startAfter(lastDoc),
+//                 limit(5)
+//             );
+//         } else {
+//             postsQuery = query(
+//                 collection(db, 'posts'),
+//                 orderBy('date', 'desc'),
+//                 limit(5)
+//             );
+//         }
+
+//         const postsSnapshot = await getDocs(postsQuery);
+//         const lastVisible = postsSnapshot.docs[postsSnapshot.docs.length - 1];
+//         const postsData = postsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as PostData);
+//         setPosts(prevPosts => [...prevPosts, ...postsData]);
+//         setLastDoc(lastVisible);
+//     };
+
+//     useEffect(() => {
+//         fetchPosts();
+//     }, []);
+
+//     const lastPostElementRef = useCallback((node: HTMLDivElement | null) => {
+//         if (observer.current) observer.current.disconnect();
+//         observer.current = new IntersectionObserver(entries => {
+//             if (entries[0].isIntersecting) {
+//                 fetchPosts(lastDoc);
+//             }
+//         });
+//         if (node) observer.current.observe(node);
+//     }, [lastDoc]);
+
+//     return (
+//         <div>
+//             {posts.map((post, index) => {
+//                 if (posts.length === index + 1) {
+//                     return <FeedTemplate ref={lastPostElementRef} key={post.id} {...post} />
+//                 } else {
+//                     return <FeedTemplate key={post.id} {...post} />
+//                 }
+//             })}
+//         </div>
+//     );
+// };
+
+// export default BoardList;
+
+
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { db } from '../firebase';
-import { collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, limit, startAfter, DocumentData } from 'firebase/firestore';
 import FeedTemplate from "./FeedTemplate";
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, QueryDocumentSnapshot } from 'firebase/firestore';
 
 type PostData = {
     id: string;
@@ -139,30 +266,76 @@ type PostData = {
 };
 
 const BoardList = () => {
-
-    //    const [posts, setPosts] = useState([]); // 불러온 게시물들을 저장할 상태
     const [posts, setPosts] = useState<PostData[]>([]);
+    const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+    const observer = useRef<IntersectionObserver | null>(null);
+
+    const fetchPosts = async (startAfterDoc: QueryDocumentSnapshot<DocumentData> | null = null, limitAmount: number) => {
+        let postsQuery = query(
+            collection(db, 'posts'),
+            orderBy('date', 'desc'),
+            limit(limitAmount)
+        );
+
+        if (startAfterDoc) {
+            postsQuery = query(
+                collection(db, 'posts'),
+                orderBy('date', 'desc'),
+                startAfter(startAfterDoc),
+                limit(limitAmount)
+            );
+        }
+
+        const postsSnapshot = await getDocs(postsQuery);
+        const lastVisible = postsSnapshot.docs[postsSnapshot.docs.length - 1];
+        const postsData = postsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as PostData);
+
+        if (startAfterDoc) {
+            setPosts(prevPosts => [...prevPosts, ...postsData]);
+        } else {
+            setPosts(postsData);
+        }
+        setLastDoc(lastVisible);
+    };
 
     useEffect(() => {
-        const fetchPosts = async () => {
-            const postsCollection = collection(db, 'posts');
-            const postsQuery = query(postsCollection, orderBy('date', 'desc'), limit(5)); // 가장 최근의 5개의 게시물을 불러옵니다.
-            const postsSnapshot = await getDocs(postsQuery);
-            // const postsData = postsSnapshot.docs.map((doc) => doc.data());
-            const postsData = postsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as PostData);
-            setPosts(postsData); // 불러온 게시물들을 상태에 저장합니다.
-        };
-
-        fetchPosts(); // 게시물 불러오기를 시작합니다.
+        fetchPosts(null, 5);
     }, []);
 
+    const lastPostElementRef = useCallback((node: HTMLDivElement | null) => {
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && lastDoc) {
+                fetchPosts(lastDoc, 5);
+            }
+        });
+        if (node) observer.current.observe(node);
+    }, [lastDoc]);
+
+    // return (
+    //     <div>
+    //         {posts.map((post, index) => {
+    //             if (posts.length === index + 1) {
+    //                 return <FeedTemplate ref={lastPostElementRef} key={post.id} {...post} />;
+    //             } else {
+    //                 return <FeedTemplate key={post.id} {...post} />;
+    //             }
+    //         })}
+    //     </div>
+    // );
     return (
         <div>
-            {posts.map((post, index) => (
-                <FeedTemplate key={index} {...post} /> // 각 게시물을 FeedTemplate 컴포넌트로 표시합니다.
-            ))}
+            {posts.map((post, index) => {
+                const key = `${post.id}_${index}`;
+                if (posts.length === index + 1) {
+                    return <FeedTemplate ref={lastPostElementRef} key={key} {...post} />;
+                } else {
+                    return <FeedTemplate key={key} {...post} />;
+                }
+            })}
         </div>
     );
+
 };
 
 export default BoardList;
