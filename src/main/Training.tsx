@@ -1,6 +1,6 @@
 const Training = () => {
     return (
-        <>Training</>
+        <>Training 서비스 준비중입니다</>
     )
 }
 

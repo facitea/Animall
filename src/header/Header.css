@@ -31,7 +31,11 @@ a{
 }
 header{
     background-color: #FFDD33;
+    width: 100%;
+    position: fixed;
+    height: 40px;
 }
+
 h1{
     margin: 4px 4px 4px 7px;
     display: inline-block;
@@ -40,6 +44,8 @@ h1{
     margin: 10px 2px 2px 2px;
     text-align: center;
 }
+/* 모바일 화면 */
+
 /*@media all and (min-width:992px) {
     .wrapper{
         width: 992px;
@@ -52,10 +58,25 @@ h1{
         width: 768px;
         margin: 0 auto;
     }
+    header{
+        background-color: #FFDD33;
+        width: 768px;
+        position: fixed;
+        height: 40px;
+    }
 }
+/* 가장 큰 화면 */
+
 @media screen and (min-width:768px) and (max-width: 1023px) {
 	.wrapper{
         width: 768px;
         margin: 0 auto;
     }
+    header{
+        background-color: #FFDD33;
+        width: 768px;
+        position: fixed;
+        height: 40px;
+    }
 }
+/* 큰 화면 */

@@ -4,6 +4,8 @@ import './FeedTemplate.css'
 import { Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import { forwardRef } from 'react';
 import { db } from '../firebase';
+import { useState, useEffect } from 'react';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 type PostData = {
     id: string;
@@ -65,19 +67,51 @@ const FeedTemplate = forwardRef<HTMLDivElement, PostData>(({ id, nickname, profi
     // const displayDate = new Date(date.seconds * 1000).toLocaleDateString(); // this converts it to a string in the format "MM/DD/YYYY"
     const displayDate = new Date(date.seconds * 1000).toLocaleString("ko-KR"); // 한국 표준 시간대에 맞게 시간까지 표시
 
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setCurrentUserId(user ? user.uid : null);
+        });
+
+        // Clean up subscription on unmount
+        return () => unsubscribe();
+    }, []);
+
+    const isCurrentUser = currentUserId === id;
+
+    console.log(id, 'id')
+    console.log(currentUserId, 'currentUserId')
+
     const handleDelete = async () => {
-        try {
-            await deleteDoc(doc(db, 'posts', id));
-        } catch (error) {
-            console.error('Error deleting post:', error);
+        if (window.confirm('Are you sure you want to delete this post?')) {
+            try {
+                // Firestore에서 게시물 데이터 삭제
+                await deleteDoc(doc(db, 'posts', id));
+
+                // 필요한 경우 다른 작업 수행
+
+            } catch (error) {
+                console.error('Error deleting post:', error);
+            }
         }
     };
+
+
+    // const handleDelete = async () => {
+    //     try {
+    //         await deleteDoc(doc(db, 'posts', id));
+    //     } catch (error) {
+    //         console.error('Error deleting post:', error);
+    //     }
+    // };
 
     return (
         <div className="feedContentBox" ref={ref}>
             <div className="feedHeader">
                 <div className="headerLeft">
-                    <div className="profileImageCircle">
+                    <div className="feedProfileImageCircle">
                         <img className="profileImage" src={profileImageUrl} alt="Profile" />
                     </div>
                     <div className="userNickname">{nickname}</div>
@@ -113,7 +147,7 @@ const FeedTemplate = forwardRef<HTMLDivElement, PostData>(({ id, nickname, profi
             </div>
             <div>
                 <div className="createdDate">{displayDate}</div>
-                <button onClick={handleDelete}>삭제</button>
+                {isCurrentUser && <button onClick={handleDelete}>삭제</button>}
             </div>
         </div>
     )

@@ -1,6 +1,6 @@
 const Shop = () => {
     return (
-        <>Shop</>
+        <>Shop 서비스 준비중입니다</>
     )
 }
 

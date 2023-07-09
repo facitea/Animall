@@ -1,6 +1,6 @@
 const Trip = () => {
     return (
-        <>Trip</>
+        <>Trip 서비스 준비중입니다</>
     )
 }
 
