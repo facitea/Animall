@@ -9,6 +9,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 type PostData = {
     id: string;
+    feedId: string;
     nickname: string;
     profileImageUrl: string;
     imageUrl: string;
@@ -63,8 +64,14 @@ type PostData = {
 //     )
 // }
 
-const FeedTemplate = forwardRef<HTMLDivElement, PostData>(({ id, nickname, profileImageUrl, imageUrl, likes, content, date }, ref) => {
+const FeedTemplate = forwardRef<HTMLDivElement, PostData>(({ id, feedId, nickname, profileImageUrl, imageUrl, likes, content, date }, ref) => {
     // const displayDate = new Date(date.seconds * 1000).toLocaleDateString(); // this converts it to a string in the format "MM/DD/YYYY"
+
+    // console.log(id, nickname, profileImageUrl, imageUrl, likes, content, date);
+    // 확실히 id는 작성자다.
+
+    console.log(feedId, 'feedId')
+
     const displayDate = new Date(date.seconds * 1000).toLocaleString("ko-KR"); // 한국 표준 시간대에 맞게 시간까지 표시
 
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -81,14 +88,16 @@ const FeedTemplate = forwardRef<HTMLDivElement, PostData>(({ id, nickname, profi
 
     const isCurrentUser = currentUserId === id;
 
-    console.log(id, 'id')
-    console.log(currentUserId, 'currentUserId')
+    // console.log(id, 'id')
+    // console.log(currentUserId, 'currentUserId')
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this post?')) {
+        if (window.confirm('삭제하시겠습니까?')) {
+
             try {
                 // Firestore에서 게시물 데이터 삭제
-                await deleteDoc(doc(db, 'posts', id));
+                await deleteDoc(doc(db, 'posts', feedId));
+                alert('삭제되었습니다.')
 
                 // 필요한 경우 다른 작업 수행
 

@@ -118,7 +118,7 @@ import { useState } from 'react';
 import { getFirestore } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getAuth } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import heic2any from "heic2any";
 
@@ -188,7 +188,16 @@ const UploadPost = () => {
         const db = getFirestore();
         const postsCollection = collection(db, 'posts');
 
-        await addDoc(postsCollection, {
+        // await addDoc(postsCollection, {
+        //   id: userId,
+        //   nickname: nickname,
+        //   profileImageUrl: profileImageUrl,
+        //   imageUrl: downloadURL,
+        //   likes: 'n',
+        //   content: content,
+        //   date: serverTimestamp()
+        // });
+        const docRef = await addDoc(postsCollection, {
           id: userId,
           nickname: nickname,
           profileImageUrl: profileImageUrl,
@@ -197,6 +206,9 @@ const UploadPost = () => {
           content: content,
           date: serverTimestamp()
         });
+
+        const docToUpdate = doc(db, 'posts', docRef.id);
+        await updateDoc(docToUpdate, { feedId: docRef.id });
 
         alert('작성 완료');
         navigate("/BoardList");

@@ -257,6 +257,7 @@ import { Timestamp, QueryDocumentSnapshot } from 'firebase/firestore';
 
 type PostData = {
     id: string;
+    feedId: string;
     nickname: string;
     profileImageUrl: string;
     imageUrl: string;
@@ -288,7 +289,9 @@ const BoardList = () => {
 
         const postsSnapshot = await getDocs(postsQuery);
         const lastVisible = postsSnapshot.docs[postsSnapshot.docs.length - 1];
-        const postsData = postsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as PostData);
+        const postsData = postsSnapshot.docs.map((doc) => ({ id: doc.id, feedId: doc.data().id, ...doc.data() }) as PostData);
+        //doc 내의 id값을 이렇게 보여주는 거구만.
+        // console.log(postsData, 'postsData');
 
         if (startAfterDoc) {
             setPosts(prevPosts => [...prevPosts, ...postsData]);
